@@ -1,7 +1,9 @@
-import 'dart:async';
-
-import 'package:first_app/cart.dart';
+import 'package:first_app/login_page.dart';
+import 'package:first_app/routes.dart';
+import 'package:first_app/tile_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/foundation/key.dart';
+import 'package:flutter/src/widgets/framework.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,128 +13,60 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List<String> _cardList = ['A', "10", "J", "K"];
-  Timer? _timerController;
-  List<String> _showedCardList = [];
-  int _timer = 1000;
+  bool loading = false;
+  void onLoginPage() {
+    Navigator.pushNamed(
+      context,
+      RouteNames.loginPage.route,
+    );
+  }
 
-  @override
-  void initState() {
-    super.initState();
-    _cardList.shuffle();
-    _timerController = Timer.periodic(Duration(milliseconds: 10), (timer) {
-      if (_timer > 0)
-        setState(() {
-          _timer = _timer - 1;
-        });
+  void onSubmit() {
+    setState(() {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("This is snack bar"),
+        action: SnackBarAction(
+          label: "Close",
+          onPressed: () => ScaffoldMessenger.of(context).clearSnackBars(),
+        ),
+      ));
     });
   }
 
-  void onClickCard(String title) {
-    if (title == "A") {
-      _timerController?.cancel();
-    }
+  void onTapTile(String title) {
     setState(() {
-      _showedCardList.add(title);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (_) => TilePage(title)));
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
     return Scaffold(
-        body: Stack(children: [
-      Align(
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          height: height * _timer / 1000,
-          color: Colors.amberAccent,
+      appBar: AppBar(title: Text("Home Page")),
+      body: Center(
+        child: ListView.builder(
+          itemBuilder: ((context, index) => ListTile(
+                title: Text("$index"),
+                leading: Icon(Icons.face),
+                trailing: Icon(Icons.chevron_right),
+                onTap: () => onTapTile("$index"),
+                style: ListTileStyle.list,
+              )),
         ),
       ),
-      Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            "Хугацаа: $_timer",
-            style: TextStyle(fontSize: 24),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              MyCard(
-                _cardList[0],
-                onTap: onClickCard,
-                active: _showedCardList.contains(_cardList[0]),
-              ),
-              SizedBox(
-                width: 50,
-              ),
-              MyCard(
-                _cardList[1],
-                onTap: onClickCard,
-                active: _showedCardList.contains(_cardList[1]),
-              )
-            ],
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              MyCard(
-                _cardList[2],
-                onTap: onClickCard,
-                active: _showedCardList.contains(_cardList[2]),
-              ),
-              SizedBox(
-                width: 50,
-              ),
-              MyCard(
-                _cardList[3],
-                onTap: onClickCard,
-                active: _showedCardList.contains(_cardList[3]),
-              )
-            ],
-          )
-        ],
-      )
-    ]));
+    );
   }
 }
 
-// Component
 
-// class MyText extends StatelessWidget {
-//   String title;
-
-//   MyText(this.title);
-//   @override
-//   Widget build(BuildContext context) {
-//     return Text(title);
-//   }
-// }
-
-// Stateless Widget
-
-// class HomePage extends StatelessWidget {
-//   String title = "Initial";
-
-//   void setTitle() {
-//     title = "hi";
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           Text(title),
+// Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+//           IconButton(
+//               onPressed: onSubmit,
+//               icon: Icon(Icons.facebook, color: Colors.blueAccent, size: 40)),
 //           ElevatedButton(
-//             onPressed: () => setTitle(),
-//             child: Text("To Change"),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+//               onPressed: () => onLoginPage(), child: Text("go to Login page")),
+//           Text("Home Page"),
+//           if (loading) CircularProgressIndicator()
+//         ]),
